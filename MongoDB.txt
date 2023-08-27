@@ -1,0 +1,158 @@
+1// *clear screen*   Ekranı temizle
+
+cls
+
+
+
+2//*Create a DataBase named Shop*  Shop isminde bir DataBase oluştur
+
+use shop
+
+
+
+3//*What DataBase am I in* Hangi DataBase'deyim
+
+db
+
+
+
+4//*If we want to see all DataBases*  Tüm DataBase'leri görmek istersek
+
+show dbs
+
+*Does not show empty DataBases*  İçi boş olan DataBase'leri göstermez
+
+
+
+
+5//*Shop içinde customers collectionı oluşturalım*  Shop içinde customers collectionı oluşturalım
+
+db.createCollection("customers")
+
+
+
+6//*List all collections* Tüm collectionlari listele
+
+db.getCollectionNames()
+
+show collections
+
+
+
+7//*Delete the Customers collection* Customers collectionını sil
+
+db.customers.drop()
+
+
+
+8//*Delete the shop database* Shop database ni sil
+
+db.dropDatabase()
+
+
+
+9//*create a new DataBase(products) and a collection(electronics) in it* yeni bir DataBase(products) ve içinde bir collection(electronics) oluşturalım
+
+use products
+db.createCollection("electronics")
+
+
+
+10//Collectiona document insert 
+
+db.electronics.insertOne({"name":"TV","price":230})
+
+Not: *Without creating a collection, the document can be inserted directly using insertOne* Collection oluşturmadan,document insertOne kullanarak doğrudan eklenebilir
+
+Not:*Double or single quotes can be used* Çift veya tek tırnak kullanılabilir
+
+
+
+11//Adding multiple documents* Birden fazla document ekleme
+
+db.electronics.insertMany([{"name":"ipod","price":110},{"name":"iphone14"},{"name":"radio","price":53,"tax":10}])
+
+Not:Multiple documents are attached in array[].* Birden fazla document dizi[] içinde edklenir.
+
+
+
+12//Adding multiple documents* Birden fazla document ekleme
+db.electronics.insert({name:"iron",price:75})
+
+db.electronics.insert([{"name":"iron","price":75},{"name":"radio","tax":8}])
+
+insert:deprecate method
+
+
+
+13//List all documents* Tüm documentları listele
+
+db.electronics.find()
+
+//It won't matter in mongosh for it to look right in json format, but in other editors, pretty command is used to have it in this format.
+*
+json formatında düzgün gözükmesi için mongosh ta farketmeyecek ama diğer editörlerde bu formatta olması için pretty komutu kullanılır
+db.electronics.find().pretty()
+
+
+
+14//List the first 2 documents*  İlk 2 documentı listeleyin
+
+db.electronics.find().limit(2)
+
+
+
+15//Let's just see the 3rd document * Sadece 3. documentı görelim
+
+db.electronics.find().skip(2).limit(1)
+
+
+
+16//Show first 2 documents from 5th document* 5.documentten itibaren ilk 2 documentı göster
+
+db.electronics.find().skip(4).limit(2)
+
+
+
+17//show the name field TV ones* Name fieldı TV olanları gösterelim
+
+db.electronics.find({"name":"TV"})
+
+***find({filter})
+
+
+
+18//List document with name:TV and price 230 name:TV olan ve price 230 olan documentı listeleyin
+
+
+db.electronics.find({$and:[{"name":"TV"},{"price":230}]})
+
+
+
+19//name:TV olan veya price 230 olan documentı listeleyin
+
+
+
+20//If we want to list only certain fields* Sadece belirli field ları listelemek istersek
+//Only prices of radios are displayed *Radio ların sadece priceleri görüntülensin
+
+db.electronics.find({"name":"radio"},{"price":1})
+
+Not:find({filter},{projection})
+
+default id 1 others 0
+
+
+
+21//Only the price and id of the radios should not be displayed* radio ların sadece price ve id si görüntülenmesin
+
+db.electronics.find({"name":"radio"},{"price":0,_id":0})
+
+//Radio's only price is shown, id is not displayed* radio ların sadece price gözüksün id görüntülenmesin
+
+
+
+22//List all document* Tüm documentları görüntüleyin
+//get only price and name information* sadece price ve name bilgileri gelsin
+
+db.electronics.find({},{"price":1,"name":1,"_id":0})
