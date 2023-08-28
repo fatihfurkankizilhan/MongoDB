@@ -1,0 +1,417 @@
+23//*Display names and prices of documents whose names are radio or TV* 
+  //Name i radyo veya TV olan documentları name ve price leri görüntüle
+
+db.electronics.find({$or:[{"name":"radio"},{"name":"TV"}]},{"name":1,"price":1,"_id":0})
+  
+
+
+
+
+24//*Sort the above query by price* Yukarıdaki sorguyu price değerine göre sırala
+
+
+db.electronics.find({$or:[{"name":"radio"},{"name":"TV"}]},{"name":1,"price":1,"_id":0}).sort("price":1)
+
+
+
+NOTE;Sort is sorted as ASC or Natural by default
+    *If we want to sort descending according to a certain field, the field is -1
+    *If we want to sort ascending according to a certain field, field 1
+
+Not:Sort defaultta ASC yada Natural olarak sıralanır
+    *belirli bir fielda göre azalan sıralamak istersek fielda -1
+    *belirli bir fielda göre artan sıralamak istersek fielda 1
+
+
+
+
+//Do the above query for the decreasing state of the price value*
+//Yukarıdaki sorguyu price değerinin azalan durumu için yapınız
+
+db.electronics.find({$or:[{"name":"radio"},
+	{"name":"TV"}]},
+{"name":1,"price":1,"_id":0}).sort({"price":-1})
+
+
+
+
+
+25//*Sort the ones by Name i TV descending by price*
+  //Name i TV olanları price değerine göre azalan sıralayın
+
+db.electronics.find({"name":"TV"}).sort({"price":-1})
+
+
+
+
+
+26//*Find the first element in the collection* Collectiondaki ilk elemanı bulunuz
+
+db.electronics.find().limit(1)
+
+db.electronics.findOne()
+
+
+
+
+
+27//*The first document in the Collection with the name i radio
+see*
+  //Collection da name i radio olan ilk documenti
+görelim
+
+db.electronics.findOne({"name":"radio"})
+
+
+
+
+
+28//*With name i TV or radio in the collection
+let's see the first document*
+  //Collectionda name i TV veya radio olan
+ilk documentı görelim
+
+db.electronics.findOne({$or:[{"name":"TV"},{"name":"radio"}]})
+
+
+
+
+
+
+
+***********************************************
+Comparison Operators
+Equality ==> $eq
+Less than ==> $lt
+Greater ==> $gt
+Less than equal ==> $lte
+Greater equal ==> $gte
+Not equal ==> $ne
+In array ==> $in
+Not in array==> $nin
+
+***************
+
+***********************************************
+Comparison Operators
+Eşitlik     ==>  $eq
+Küçüktür    ==>  $lt 
+Büyüktür    ==>  $gt
+Küçük eşit  ==>  $lte
+Büyük eşit  ==>  $gte
+Eşit değil  ==>  $ne 
+Dizi içinde ==>  $in 
+Dizide değil==>  $nin
+
+***************
+
+
+
+
+
+29// price ı 110 olan documentı görüntüle
+
+db.electronics.find({"price":{$eq:110}})
+
+
+
+
+
+30//*Documents with a price of 300 or less
+show
+  //*Price ı 300 veya daha az olan document ları
+gösterin
+
+
+db.electronics.find({"price":{$lte:300}})
+
+
+
+
+
+31//Do not show id in the above query* Yukarıdaki sorguda id görünmesin
+
+
+db.electronics.find({"price":{$lte:300}},{"_id":0})
+
+
+
+
+
+32//Only those with a price greater than 100
+Let's see their name and price
+  // Price ı 100 den büyük olanların sadece 
+name ve price larını görelim
+
+
+db.electronics.find({"price":{$gt:100}},{"name":1,"price":1,"_id":0})
+
+
+
+
+
+
+
+33//*Let's see only the name and price of those whose Price is 230,110 or 123
+  //* Price ı 230,110 veya 123 olanların sadece name ve pricelarını görelim
+
+
+db.electronics.find({$or:[{"price":230},{"price":110},{"price":123}]},{"name":1,"price":1,"_id":0})
+
+db.electronics.find({"price":{$in:[230,110,123]}},{"name":1,"price":1,"_id":0})
+
+
+
+
+
+
+34//*For those whose price is not 230,110 or 123, only name and
+let's see the prices
+  //* Price ı 230,110 veya 123 olmayaanların sadece name ve 
+pricelarını görelim
+
+
+db.electronics.find({"price":{$nin:[230,110,123]}},{"name":1,"price":1,"_id":0})
+
+
+
+
+
+
+
+
+
+
+
+
+//==================================================== ===================
+// findOneAndUpdate - findOneAndReplace
+//==================================================== ===================
+
+// A - findOneAndReplace()
+//-----------------------------
+// 1-) finds and changes the first document that meets the specified conditions.
+// 2-) Left blank while updating the parts specified in the command
+// removes fields. (It can be likened to the PUT method in APIs).
+// 3-) At the end of the process, it shows the updated version of the related document.
+// so it tells me that I changed it
+
+//
+// B - findOneAndUpdate()
+//-----------------------------
+/// 1-) Finds and updates the first document that meets the specified conditions.
+// 2-) Left blank while updating the parts specified in the command
+// does not modify fields (similar to PATCH method in APIs).
+// 3-) After the conditional part of the command, a
+// the atomic operator is used.
+// ($set (direct value), $inc(increment decrement), $mul (multiply), etc.)
+// 4) At the end of the operation, it shows the non-updated version of the related document.
+
+//==================================================== ===================
+// IMPORTANT : !!! When these 2 codes run, the un-updated version of the document is displayed.
+// SYNTAX : ( {filter}, {update}, {options})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//=================================================================
+//            findOneAndUpdate - findOneAndReplace
+//=================================================================
+
+// A - findOneAndReplace() 
+//----------------------------
+//   1-) belirtilen koşullara uyan ilk dökümanı bulur ve degistirir. 
+//   2-) Komut icerisinde belirtilen kisimlari guncellerken bos birakilan 
+//       alanlari kaldirir. (API'lerdeki PUT metoduna benzetilebilir).
+//   3-) Islem sonunda ilgili dokumanin guncellenmemiş halini gosterir.
+//       yani ben bunu değiştirdim diye haber veriyor
+
+//       
+// B - findOneAndUpdate() 
+//----------------------------
+///  1-) Belirtilen koşullara uyan ilk dökümanı bulur ve günceller. 
+//   2-) Komut icerisinde belirtilen kisimlari guncellerken bos birakilan 
+//       alanlari modifiye etmez  (API'lerdeki PATCH metoduna benzetilebilir).
+//   3-) komutun kosul kismindan sonra degislikileri gerceklestirmek icin bir 
+//       atomic operator kullanilir. 
+//       ($set (direk değer verilirse), $inc(arttırma azaltma), $mul (çarpma)vb.)
+//   4)  Islem sonunda ilgili dokumanin guncellenMEmiş halini gosterir.
+
+//=================================================================
+// ÖNEMLİ : !!!  bu 2 kod çalıştığında dökümanın update olmamış hali ekrana gelir.
+// SYNTAX : ( {filter}, {update}, {options})
+
+
+
+
+
+35//*Document with a price of less than 100
+name:"Car"
+price:400
+replace with document
+  //* Price ı 100 den az olan documentı 
+name:"Car"
+price:400
+olan document ile değiştiriniz
+
+
+
+db.electronics.findOneAndReplace({"price":{$lt:100}},
+	{"name":"Car","price":400})
+
+
+
+
+
+
+
+
+
+
+36//*Price i greater than 100
+the lowest price of the documents
+document
+replace "name":"cheapest"
+  //*Price i 100 den büyük olan
+documentlardan price ı en düşük olan
+documentı
+"name":"en ucuz" ile değiştirelim
+
+
+
+db.electronics.findOneAndReplace({"price":{$gt:100}},{"name":"en ucuz"},{sort:{"price":1}})
+
+
+
+
+
+
+
+
+37//*Price information is greater than 100
+largest of the documents
+Update "name":"most expensive"
+  //*Price bilgisi 100 den büyük olan
+documentlardan en büyüğünü
+"name":"en pahalı" olarak güncelleyin
+
+
+db.electronics.findOneAndUpdate({"price":{$gt:100}},{$set:{"name":"en pahalı"}},{sort:{"price":-1}})
+
+
+
+
+
+
+38//*Price information is less than 100
+"updated" first document name
+update as
+  //*Price bilgisi 100 den küçük
+ilk document ismini "güncellendi"
+olarak güncelleyiniz
+
+
+db.electronics.findOneAndUpdate({"price":{$lt:100}},{$set:{"name":"güncellendi"}})
+
+
+
+
+
+
+
+
+39//*Price less than 200
+The highest price among documents
+update the name of the one to "idare eder"
+  //*Fiyatı 200 den küçük olan
+documentlar içinde fiyatı en büyük 
+olanın ismini "idare eder" olarak güncelleyin 
+
+
+db.electronics.findOneAndUpdate({"price":{$lt:200}},{$set:{"name":"idare eder"}},{sort:{"price":-1}})
+
+
+
+
+
+
+40//*Its first document with a price of 230
+find it and update its price to 350 and
+Let's see the UPDATED document
+  //*Price ı 230 olan ilk documentı
+bulup price ını 350 olarak güncelle ve
+GÜNCELLENMİŞ documentı görelim 
+
+
+db.electronics.findOneAndUpdate({"price":230},{$set:{"price":350}},{returnNewDocument:true})
+defaultta false* olarak ayarlanmış
+
+
+
+
+
+
+41//*Find the document with a price of 930
+Let's update it to name:"GOLD", "price":250
+If not, add it as a document.
+  //*Price ı 930 olan documentı bulup
+name:"GOLD", "price":250 olarak güncelleyelim
+eğer yoksa da document olarak eklesin
+
+
+db.electronics.findOneAndUpdate({"price":230},{$set:{"price":350}},{returnNewDocument:true})
+
+upsert: update + insert
+
+
+db.electronics.findOneAndUpdate({"price":930},{$set:{"name":"GOLD","price":250}},{upsert:true,returnNewDocument:true})
+
+
+
+
+
+
+
+
+
+
+42//*Multiple document updates
+All documents with a price less than 300
+make your name Woww
+  //*Birden fazla document güncellemesi
+Fiyatı 300 den düşük olan bütün documentların
+ismini Woww yapın
+
+
+
+db.electronics.updateMany({"price":{$lt:300}},{$set:{"name":"Woww"}})
+
+
+
+
+
+
+43//*All with price less than 300
+Multiply the price of the documents by 2
+  //*Fiyatı 300 den düşük olan bütün
+documentların price ın 2 ile çarpalım
+
+
+db.electronics.updateMany(
+{"price":{$lt:300}},
+{$mul:{"price":2}}
+)
