@@ -1,0 +1,350 @@
+44//*Let's increase the price of all documents with a price less than 200 by 50*
+  //Fiyatı 200 den düşük olan bütün documentler in price değerini 50 arttıralım
+
+
+use ("products");
+db.electronics.updateMany(
+    {"price":{$lt:200}},
+    {$inc:{"price":50}}
+)
+
+use ("products");
+db.electronics.find();
+
+
+
+
+
+
+45//*If we want to delete a document*  Bir documentı silmek istersek
+  //Delete first document with name i cheapest* Name i en ucuz olan ilk documentı sil
+
+use ("products");
+db.electronics.deleteOne({"name":"en ucuz"});
+
+
+
+
+
+
+46//*If we want to delete multiple documents 
+  //*Birden fazla document silmek istersek
+  //*Delete all documents with "name":"Woww" 
+  //*"name":"Woww" olan tüm documentlerı silelim
+
+
+use ("products");
+db.electronics.deleteMany({"name":"Woww"})
+
+
+
+
+
+
+47//**Let's delete all documents * Tüm documentları silelim
+
+
+//1.
+use ("products");
+db.electronics.deleteMany({});
+
+//2.
+use ("products");
+db.electronics.remove({}); //deprecated
+
+//3.
+use ("products");
+db.electronics.delete(); //romoved
+
+
+
+
+
+
+
+48//**Let's add a new document** Yeni bir document ekleyelim
+
+
+use ("products");
+db.electronics.insertOne({"name":"laptop",
+                          "brand":{"name":"Lenovo","model":"ThinkPadX1"},
+                          "city":["Ankara","Bursa"],
+                          "active":true});
+
+use ("products");
+db.electronics.find({"brand.model":"ThinkPadX1"})
+
+use ("products");
+db.electronics.find({"city":"Bursa"})
+
+
+
+
+
+
+
+
+
+
+//==================================================== =
+// AGGREGATION
+//==================================================== =
+// 1) Aggregation, processing of data in documents and calculated
+// are the operations that cause the results to be returned.
+//
+// 2) Aggregation operations can group values from different documents.
+//
+// 3) By performing various operations on these grouped data, a single
+// a result value can be returned.
+//
+// 4) MongoDB allows aggregation with 3 different methods.
+// A) aggregation pipeline --> best practice...
+// B) map-reduce function (map reduction)
+// C) single-purpose aggregation
+//
+// 5) Aggregiation can be compared to Join operations in SQL.
+//==================================================== =
+// AGGREGATION PIPELINE
+//==================================================== =
+// SYNTAX
+//
+// pipeline = [
+// { $match : { … }},
+// { $group : { … }},
+// { $sort : { … }},
+// ...
+// ]
+// db.collectionName.aggregate({pipeline}, {options})
+//
+// $match() –> To filter data while selecting
+// $group({_id : "$field"}) - >for grouping the processed data
+// $sort() -> To sort the results
+
+
+
+
+
+
+
+
+
+
+
+
+
+//=================================================
+//                   AGGREGATION
+//=================================================
+// 1) Aggregation, dokumanlardaki verilerin islenmesi ve hesaplanan 
+//    sonuclarin donmesini saglayan islemlerdir. 
+//
+// 2) Aggregation islemleri, farklı dokumanlardaki degerleri gruplandirabilir.
+//
+// 3) Bu gruplanan veriler uzerinde cesitli islemlerin gereceklestirelerek tek 
+//    bir sonuc degerinin donmesi saglanabilir.
+//
+// 4) MongoDB, 3 farklı yontem ile aggregation gerceklestirmeye izin verir.
+//     A) aggregation pipeline (toplama boru hattı) --> best practice...
+//     B) map-reduce function (map indirgeme)
+//     C) single-purpose aggregation (tek-amaç toplama) 
+//
+// 5) Aggregiation, SQL'deki Join islemlerine benzetilebilir. 
+//=================================================
+//             AGGREGATION PIPELINE
+//=================================================
+// SYNTAX
+// 
+//   pipeline = [
+//   { $match : { … }},
+//   { $group : { … }},
+//   { $sort : { … }},
+//      ...
+//   ]
+//   db.collectionName.aggregate({pipeline}, {options})
+//
+//  $match() –> Verileri secerken filtrelemek icin
+//  $group({_id : "$field"}) - >islenen verilerin gruplanmasi icin 
+//  $sort() -> Sonuclarin siralanmasi icin
+
+
+
+
+
+use('okul');
+db.grades.insertMany([
+{"_id":6305, "name": "A. MacDyver", "assignment":5, "points" :24},
+{"_id":6308, "name": "B. Batlock", "assignment":3, "points" :22},
+{"_id":6312, "name": "M. Tagnum", "assignment":5, "points" :30},
+{"_id":6319, "name": "R. Stiles", "assignment":2, "points" :12},
+{"_id":6322, "name": "A. MacDyver", "assignment":2, "points" :14},
+{"_id":6334, "name": "R. Stiles", "assignment":1, "points" :10},
+{"_id":6345, "name": "A. Stiles", "assignment":1, "points" :10}
+]);
+
+
+
+
+
+
+
+1//Her bir assignment için toplam puanları listeleyelim
+
+use('okul');
+var pipeline=[
+//taskin aşamaları filtreleme yok, gruplama var
+{$group:{"_id":"$assignment","total_points":{$sum:"$points"}}} //"$points" demek points deki value yu yani değeri al demek 
+];
+db.grades.aggregate(pipeline);
+
+
+
+
+
+
+2//*Let's list the total points for each assignment
+ //*Her bir assignmentın ortalama puanlarını hesaplayın
+ //Sort in ascending order *Artan olarak sıralayın
+
+use('okul');
+var pipeline=[
+//*There is no filtering in stages, there is grouping 
+//*Aşamalar da filtreleme yok, gruplama var
+
+{$group:{"_id":"$assignment","avg_points":{$avg:"$points"}}}, //"$points" demek points deki value yu yani değeri al demek 
+{$sort:{avg_points:1}}
+];
+db.grades.aggregate(pipeline);
+
+
+
+
+
+
+
+
+3//*Let's calculate the min points of each assignment
+ //*Her bir assignmentın min puanlarını hesaplayalım
+ //*Let's list in descending order *Azalan şekilde listeleyelim
+
+use('okul');
+var pipeline=[
+    {$group:{_id:"$assignment",min_points:{$min:"$points"}}},
+    {$sort:{min_points:-1}}
+]
+db.grades.aggregate(pipeline);
+
+
+//when there is more than one condition
+//Price less than 400
+//Name of the 2nd largest element
+//Make it cheapest
+
+
+//Birden fazla şart olduğunda
+//Price ı 400 den küçük olan
+//En büyük 2. elemanın name ini 
+//En ucuz yapın
+var pipeline=[
+    {$match:{"price":{$lt:400}}},
+    {$sort:{"price":-1}},
+    {$skip:1},
+    {$limit:1},
+    {$set:{"name":"en ucuz"}}
+]
+
+
+
+
+
+
+
+
+4//Assignment value less than 4
+  // Let's calculate the max points of each assignment
+  // list in descending order
+
+ //Assignment değeri 4 ten küçük olan
+ //Her bir assignmentın max puanlarını hesaplayalım
+ //Azalan şekilde listeleyelim
+
+use('okul');
+var pipeline=[
+{$match:{"assignment":{$lt:4}}},
+{$group:{"_id":"$assignment","max_puan":{$max:"$points"}}},
+{$sort:{"max_puan":-1}}
+]
+db.grades.aggregate(pipeline);
+
+
+
+
+
+
+5// Total scores of documents whose names start with A
+ // Let's calculate and list
+ //İsmi A ile başlayan document lerin toplam puanlarını
+ //Hesaplayıp listeleyelim
+
+use('okul');
+var pipeline=[
+
+    {$match:{"name":{$regex:"^A",$options:"i"}}}, //$options:"i" büyük küçük harf duyarsız hale getiriyor
+    {$group:{"_id":"", "total_points":{$sum:"$points"}}} //gruplama yok ise "" veya null kullanılı
+]
+
+db.grades.aggregate(pipeline);
+
+
+
+
+
+
+
+6// total scores of documents ending in s
+// calculate and list
+
+//ismi s ile biten documentların toplam puanlarını
+//hesaplayıp listeleyelim
+
+
+use('okul');
+var pipeline=[
+
+    {$match:{"name":{$regex:"s$"}}},
+    {$group:{"_id":"", "total_points":{$sum:"$points"}}}  //gruplama yok ise "" veya null kullanılı
+]
+
+db.grades.aggregate(pipeline);
+
+use('okul');
+db.grades.find();
+
+
+
+
+
+
+
+
+7//Let's find the number of documents with points less than 19
+ //Points değeri 19 dan düşük olan documentsların sayısını bulalım
+
+
+//1.
+
+use('okul');
+db.grades.find({"points":{$lt:19}}).count();
+
+
+
+//2.
+use('okul');
+db.grades.count({"points":{$lt:19}});
+
+//3.
+use ("okul");
+var pipeline=[
+    {$match:{"points":{$lt:19}}},
+    {$count:"düşük puanlar"}
+];
+db.grades.aggregate(pipeline);
